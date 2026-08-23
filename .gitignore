@@ -1,0 +1,6 @@
+.secrets.json
+.git/
+# sessions/ tracked for cloud persistence
+__pycache__/
+*.pyc
+

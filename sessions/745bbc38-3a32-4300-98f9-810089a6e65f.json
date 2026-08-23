@@ -1,0 +1,588 @@
+{
+  "session_id": "745bbc38-3a32-4300-98f9-810089a6e65f",
+  "project_name": "Direct Subprocess Audit Test",
+  "target_url": "https://httpbin.org",
+  "created_at": "2026-08-22T13:42:43.258072",
+  "updated_at": "2026-08-22T13:44:45.665362",
+  "chat_history": [],
+  "sast_results": [
+    {
+      "header": "Content-Security-Policy",
+      "issue": "CSP missing → XSS attacks possible",
+      "severity": "Critical",
+      "mitre_attack": "T1059.007 (JavaScript Execution)",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "X-Frame-Options",
+      "issue": "Clickjacking protection missing",
+      "severity": "High",
+      "mitre_attack": "T1190",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "Strict-Transport-Security",
+      "issue": "HSTS missing → MITM/SSL-stripping possible",
+      "severity": "High",
+      "mitre_attack": "T1557 (Man-in-the-Middle)",
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "header": "X-Content-Type-Options",
+      "issue": "MIME-sniffing attacks possible",
+      "severity": "Medium",
+      "mitre_attack": "T1190",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "Referrer-Policy",
+      "issue": "Data leakage via referrer header",
+      "severity": "Low",
+      "mitre_attack": "T1190",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "Permissions-Policy",
+      "issue": "Browser feature abuse possible",
+      "severity": "Low",
+      "mitre_attack": "T1190",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "X-XSS-Protection",
+      "issue": "Legacy XSS filter not set",
+      "severity": "Low",
+      "mitre_attack": "T1059.007 (JavaScript Execution)",
+      "stride_category": "Tampering"
+    },
+    {
+      "header": "Server",
+      "issue": "Server version exposed: gunicorn/19.9.0",
+      "severity": "Low",
+      "mitre_attack": "T1552 (Unsecured Credentials)",
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "issue": "❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن",
+      "severity": "High",
+      "mitre_attack": "T1566 (Phishing / Email Spoofing)",
+      "stride_category": "Spoofing"
+    }
+  ],
+  "dast_results": [
+    {
+      "url": "https://httpbin.org",
+      "status": 200,
+      "headers": {
+        "Content-Security-Policy": "❌ Missing",
+        "X-Frame-Options": "❌ Missing",
+        "Strict-Transport-Security": "❌ Missing",
+        "X-Content-Type-Options": "❌ Missing",
+        "Referrer-Policy": "❌ Missing",
+        "Permissions-Policy": "❌ Missing",
+        "X-XSS-Protection": "❌ Missing",
+        "Server": "⚠️ gunicorn/19.9.0 (info disclosure)"
+      },
+      "findings": [
+        {
+          "header": "Content-Security-Policy",
+          "issue": "CSP missing → XSS attacks possible",
+          "severity": "Critical"
+        },
+        {
+          "header": "X-Frame-Options",
+          "issue": "Clickjacking protection missing",
+          "severity": "High"
+        },
+        {
+          "header": "Strict-Transport-Security",
+          "issue": "HSTS missing → MITM/SSL-stripping possible",
+          "severity": "High"
+        },
+        {
+          "header": "X-Content-Type-Options",
+          "issue": "MIME-sniffing attacks possible",
+          "severity": "Medium"
+        },
+        {
+          "header": "Referrer-Policy",
+          "issue": "Data leakage via referrer header",
+          "severity": "Low"
+        },
+        {
+          "header": "Permissions-Policy",
+          "issue": "Browser feature abuse possible",
+          "severity": "Low"
+        },
+        {
+          "header": "X-XSS-Protection",
+          "issue": "Legacy XSS filter not set",
+          "severity": "Low"
+        },
+        {
+          "header": "Server",
+          "issue": "Server version exposed: gunicorn/19.9.0",
+          "severity": "Low"
+        }
+      ],
+      "raw": {
+        "Date": "Sat, 22 Aug 2026 13:42:46 GMT",
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "9593",
+        "Connection": "keep-alive",
+        "Server": "gunicorn/19.9.0",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    {
+      "findings": [],
+      "cert_info": {
+        "subject": {
+          "commonName": "httpbin.org"
+        },
+        "issuer": {
+          "countryName": "US",
+          "organizationName": "Amazon",
+          "commonName": "Amazon RSA 2048 M01"
+        },
+        "expires": "2027-01-02",
+        "days_remaining": 133,
+        "tls_version": "TLSv1.2"
+      },
+      "status": "✅ شهادة سارية | TLSv1.2 | تنتهي: 2027-01-02 (133 يوم)"
+    },
+    {
+      "records": {
+        "A": [
+          "52.0.42.46",
+          "54.172.31.170",
+          "44.219.72.9",
+          "3.234.68.252",
+          "34.202.68.214",
+          "44.196.25.30",
+          "44.223.250.126",
+          "34.195.135.204"
+        ],
+        "AAAA": [],
+        "MX": [],
+        "NS": [
+          "ns-1555.awsdns-02.co.uk.",
+          "ns-173.awsdns-21.com.",
+          "ns-884.awsdns-46.net.",
+          "ns-1053.awsdns-03.org."
+        ],
+        "TXT": [
+          "\"v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all\""
+        ],
+        "CNAME": []
+      },
+      "findings": [
+        {
+          "issue": "❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن",
+          "severity": "High"
+        }
+      ],
+      "status": "✅ تم فحص DNS لـ httpbin.org"
+    },
+    {
+      "endpoints_tested": [
+        {
+          "url": "/api/users/1",
+          "status": 404
+        },
+        {
+          "url": "/api/user/1",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/users/1",
+          "status": 502
+        },
+        {
+          "url": "/api/account",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/me",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/profile",
+          "status": 404
+        },
+        {
+          "url": "/graphql",
+          "status": 404
+        },
+        {
+          "url": "/api/graphql",
+          "status": 404
+        },
+        {
+          "url": "/swagger.json",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/swagger.json",
+          "status": 404
+        },
+        {
+          "url": "/v2/api-docs",
+          "status": 404
+        },
+        {
+          "url": "/api-docs",
+          "status": 404
+        }
+      ],
+      "findings": [],
+      "keys_leaked": []
+    }
+  ],
+  "remediation_patches": [
+    {
+      "cwe": "CSP missing → XSS attacks possible",
+      "severity": "Critical",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'CSP missing → XSS attacks possible'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "Clickjacking protection missing",
+      "severity": "High",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'Clickjacking protection missing'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "HSTS missing → MITM/SSL-stripping possible",
+      "severity": "High",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'HSTS missing → MITM/SSL-stripping possible'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "MIME-sniffing attacks possible",
+      "severity": "Medium",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'MIME-sniffing attacks possible'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "Data leakage via referrer header",
+      "severity": "Low",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'Data leakage via referrer header'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "Browser feature abuse possible",
+      "severity": "Low",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'Browser feature abuse possible'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "Legacy XSS filter not set",
+      "severity": "Low",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'Legacy XSS filter not set'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "Server version exposed: gunicorn/19.9.0",
+      "severity": "Low",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'Server version exposed: gunicorn/19.9.0'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    },
+    {
+      "cwe": "❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن",
+      "severity": "High",
+      "file": "https://httpbin.org",
+      "patch_code": "SecRule ARGS \"@detectSQLi\" \"id:10001,phase:2,deny,status:403,log,msg:'❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن'\"",
+      "verification_status": "✅ Automatic WAF Rule Generated"
+    }
+  ],
+  "execution_logs": [
+    "[13:42:43] 🔍 [Phase 1] Executing HTTP Headers Security Audit...",
+    "[13:42:46] 🔒 [Phase 2] Executing SSL/TLS Socket Certificate Inspector...",
+    "[13:42:47] 🌐 [Phase 3] Executing DNS Reconnaissance (SPF, DMARC, MX)...",
+    "[13:42:48] ⚡ [Phase 4] Executing Active Injection Suite (SQLi & Reflected XSS)...",
+    "[13:42:52] 📁 [Phase 5] Fuzzing Common Paths & Hidden Admin/Config Directories...",
+    "[13:43:27] 🛡️ [Phase 6] Auditing API Security, BOLA/IDOR Endpoints & Regex Key Leaks...",
+    "[13:43:47] 🧰 [Phase 6.5] Launching Heavy OS Pentest Suite (Nmap, Nuclei v3, Subfinder, FFUF Fuzzer)...",
+    "[13:44:22] 🧠 [Phase 7] Invoking DeepSeek-R1 via Cloudflare Workers AI for MITRE & STRIDE Threat Mapping...",
+    "[13:44:30] 🥷 [Phase 8] Invoking GLM / Mistral-7B via Cloudflare Workers AI for WAF & PyTest Patch Generation...",
+    "[13:44:45] ✅ Enterprise Audit Pipeline Completed Successfully!"
+  ],
+  "detailed_tool_logs": [
+    "=== DETAILED STREAMING DIAGNOSTIC FOR TARGET: https://httpbin.org ===",
+    "[Phase 1: HTTP Headers] Status: 200 | Findings: 8",
+    "[Phase 2: SSL/TLS] Certificate Status: ✅ شهادة سارية | TLSv1.2 | تنتهي: 2027-01-02 (133 يوم) | Findings: 0",
+    "[Phase 3: DNS Recon] Status: ✅ تم فحص DNS لـ httpbin.org | Records: ['A', 'AAAA', 'MX', 'NS', 'TXT', 'CNAME']",
+    "[Phase 4: Active Injections] Status: ✅ اكتمل الفحص النشط | SQLi: 0 | XSS: 0",
+    "[Phase 5: Directory Fuzzing] Status: ✅ اكتمل فحص المسارات | موجود: 1 | خطير: 0 | Found: 1",
+    "[Phase 6: API Security] Endpoints Tested: 12 | Findings: 0",
+    "[OS Tool: Nmap Error] Command '['nmap', '-p', '80,443,8080,8443', '-sV', '--open', '-T4', 'httpbin.org']' timed out after 15 seconds",
+    "[OS Tool: Nuclei Error] Command '['nuclei', '-u', 'https://httpbin.org', '-severity', 'critical,high', '-silent', '-timeout', '10']' timed out after 20 seconds"
+  ],
+  "real_scan_results": {
+    "headers": {
+      "url": "https://httpbin.org",
+      "status": 200,
+      "headers": {
+        "Content-Security-Policy": "❌ Missing",
+        "X-Frame-Options": "❌ Missing",
+        "Strict-Transport-Security": "❌ Missing",
+        "X-Content-Type-Options": "❌ Missing",
+        "Referrer-Policy": "❌ Missing",
+        "Permissions-Policy": "❌ Missing",
+        "X-XSS-Protection": "❌ Missing",
+        "Server": "⚠️ gunicorn/19.9.0 (info disclosure)"
+      },
+      "findings": [
+        {
+          "header": "Content-Security-Policy",
+          "issue": "CSP missing → XSS attacks possible",
+          "severity": "Critical"
+        },
+        {
+          "header": "X-Frame-Options",
+          "issue": "Clickjacking protection missing",
+          "severity": "High"
+        },
+        {
+          "header": "Strict-Transport-Security",
+          "issue": "HSTS missing → MITM/SSL-stripping possible",
+          "severity": "High"
+        },
+        {
+          "header": "X-Content-Type-Options",
+          "issue": "MIME-sniffing attacks possible",
+          "severity": "Medium"
+        },
+        {
+          "header": "Referrer-Policy",
+          "issue": "Data leakage via referrer header",
+          "severity": "Low"
+        },
+        {
+          "header": "Permissions-Policy",
+          "issue": "Browser feature abuse possible",
+          "severity": "Low"
+        },
+        {
+          "header": "X-XSS-Protection",
+          "issue": "Legacy XSS filter not set",
+          "severity": "Low"
+        },
+        {
+          "header": "Server",
+          "issue": "Server version exposed: gunicorn/19.9.0",
+          "severity": "Low"
+        }
+      ],
+      "raw": {
+        "Date": "Sat, 22 Aug 2026 13:42:46 GMT",
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "9593",
+        "Connection": "keep-alive",
+        "Server": "gunicorn/19.9.0",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    "ssl": {
+      "findings": [],
+      "cert_info": {
+        "subject": {
+          "commonName": "httpbin.org"
+        },
+        "issuer": {
+          "countryName": "US",
+          "organizationName": "Amazon",
+          "commonName": "Amazon RSA 2048 M01"
+        },
+        "expires": "2027-01-02",
+        "days_remaining": 133,
+        "tls_version": "TLSv1.2"
+      },
+      "status": "✅ شهادة سارية | TLSv1.2 | تنتهي: 2027-01-02 (133 يوم)"
+    },
+    "dns": {
+      "records": {
+        "A": [
+          "52.0.42.46",
+          "54.172.31.170",
+          "44.219.72.9",
+          "3.234.68.252",
+          "34.202.68.214",
+          "44.196.25.30",
+          "44.223.250.126",
+          "34.195.135.204"
+        ],
+        "AAAA": [],
+        "MX": [],
+        "NS": [
+          "ns-1555.awsdns-02.co.uk.",
+          "ns-173.awsdns-21.com.",
+          "ns-884.awsdns-46.net.",
+          "ns-1053.awsdns-03.org."
+        ],
+        "TXT": [
+          "\"v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all\""
+        ],
+        "CNAME": []
+      },
+      "findings": [
+        {
+          "issue": "❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن",
+          "severity": "High"
+        }
+      ],
+      "status": "✅ تم فحص DNS لـ httpbin.org"
+    },
+    "active": {
+      "sqli_findings": [],
+      "xss_findings": [],
+      "forms_found": [],
+      "status": "✅ اكتمل الفحص النشط | SQLi: 0 | XSS: 0"
+    },
+    "directories": {
+      "found": [
+        {
+          "path": "/robots.txt",
+          "status": 200,
+          "size": 30
+        }
+      ],
+      "dangerous": [],
+      "status": "✅ اكتمل فحص المسارات | موجود: 1 | خطير: 0"
+    },
+    "api_security": {
+      "endpoints_tested": [
+        {
+          "url": "/api/users/1",
+          "status": 404
+        },
+        {
+          "url": "/api/user/1",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/users/1",
+          "status": 502
+        },
+        {
+          "url": "/api/account",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/me",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/profile",
+          "status": 404
+        },
+        {
+          "url": "/graphql",
+          "status": 404
+        },
+        {
+          "url": "/api/graphql",
+          "status": 404
+        },
+        {
+          "url": "/swagger.json",
+          "status": 404
+        },
+        {
+          "url": "/api/v1/swagger.json",
+          "status": 404
+        },
+        {
+          "url": "/v2/api-docs",
+          "status": 404
+        },
+        {
+          "url": "/api-docs",
+          "status": 404
+        }
+      ],
+      "findings": [],
+      "keys_leaked": []
+    },
+    "os_tool_findings": [],
+    "enriched_findings": [
+      {
+        "header": "Content-Security-Policy",
+        "issue": "CSP missing → XSS attacks possible",
+        "severity": "Critical",
+        "mitre_attack": "T1059.007 (JavaScript Execution)",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "X-Frame-Options",
+        "issue": "Clickjacking protection missing",
+        "severity": "High",
+        "mitre_attack": "T1190",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "Strict-Transport-Security",
+        "issue": "HSTS missing → MITM/SSL-stripping possible",
+        "severity": "High",
+        "mitre_attack": "T1557 (Man-in-the-Middle)",
+        "stride_category": "Information Disclosure"
+      },
+      {
+        "header": "X-Content-Type-Options",
+        "issue": "MIME-sniffing attacks possible",
+        "severity": "Medium",
+        "mitre_attack": "T1190",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "Referrer-Policy",
+        "issue": "Data leakage via referrer header",
+        "severity": "Low",
+        "mitre_attack": "T1190",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "Permissions-Policy",
+        "issue": "Browser feature abuse possible",
+        "severity": "Low",
+        "mitre_attack": "T1190",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "X-XSS-Protection",
+        "issue": "Legacy XSS filter not set",
+        "severity": "Low",
+        "mitre_attack": "T1059.007 (JavaScript Execution)",
+        "stride_category": "Tampering"
+      },
+      {
+        "header": "Server",
+        "issue": "Server version exposed: gunicorn/19.9.0",
+        "severity": "Low",
+        "mitre_attack": "T1552 (Unsecured Credentials)",
+        "stride_category": "Information Disclosure"
+      },
+      {
+        "issue": "❌ لا يوجد سجل DMARC → انتحال هوية الإيميل ممكن",
+        "severity": "High",
+        "mitre_attack": "T1566 (Phishing / Email Spoofing)",
+        "stride_category": "Spoofing"
+      }
+    ],
+    "ai_summary": "### 🧠 تحليل DeepSeek-R1 (MITRE & STRIDE Model):\n<think>\nOkay, so I'm looking at this analysis of the website https://httpbin.org, and there are several security issues mentioned. I need to understand each of these points to figure out what's going wrong and how to fix them. Let me go through each one step by step.\n\nFirst, there's a critical issue about the CSP being missing. CSP stands for Content Security Policy, right? It's used to prevent XSS attacks because it tells the browser which sources of content are allowed to load. If it's missing, that means any scripts could potentially be injected into the site, which is bad. So, the site is vulnerable to XSS attacks because of this.\n\nNext, there's a high issue about missing clickjacking protection. Clickjacking is when an attacker tricks a user into clicking something they didn't intend to, like a button on another site. Without protection, this site could be embedded in a frame or iframe, making clickjacking possible. That's a serious issue because it can lead to unauthorized actions by users.\n\nAnother high issue is that HSTS is missing. HSTS stands for HTTP Strict Transport Security, and it forces the browser to use HTTPS even if the user types in HTTP. Without HSTS, an attacker could perform a man\n\n---\n### 🥷 تحليل GLM Security Engine (Remediation & Patches):\nBased on the given website <https://httpbin.org>, here is the suggested code snippet for implementing the WAF rules with Forward Compatible CSP and Clickjacking protection:\n\n1. CSP (Content Security Policy)\n\n```python\nContent-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'https://apis.google.com' 'https://www.gstatic.com'; style-src 'self' 'unsafe-inline'; img-src 'self' data: 'https://fonts.googleapis.com' 'https://www.google-analytics.com'; font-src 'self' 'https://fonts.gstatic.com'; connect-src 'self'; frame-ancestors 'none';\n```\n\n2. Clickjacking Protection\n\n```python\nX-Frame-Options: DENY\nX-XSS-Protection: 1; mode=block\nX-Content-Type-Options: nosniff\nX-Permitted-Cross-Domain-Policies: none\n```\n\n3. HST",
+    "total_findings": 9,
+    "critical_count": 1,
+    "high_count": 3
+  }
+}

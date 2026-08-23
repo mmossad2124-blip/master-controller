@@ -1,0 +1,35 @@
+{
+  "project_name": "AI-Bot-DevSecOps Platform",
+  "version": "1.0.0",
+  "accounts": [
+    {
+      "id": 1,
+      "email": "mmossad2124@gmail.com",
+      "username": "mmossad2124-blip",
+      "github_repo": "https://github.com/mmossad2124-blip/master-controller",
+      "hf_space": "mmossad2124/sast-recon-agent",
+      "role": "Master Orchestration & SAST Analysis (DeepSeek-R1)"
+    },
+    {
+      "id": 2,
+      "email": "mmossad2224@gmail.com",
+      "username": "mmossad2224-eng",
+      "github_repo": "https://github.com/mmossad2224-eng/vector-db-state",
+      "hf_space": "mmossad2224/dast-athena-sandbox",
+      "role": "DAST Athena OS Sandbox (GLM-5.2 + Playwright)"
+    },
+    {
+      "id": 3,
+      "email": "mmossad2324@gmail.com",
+      "username": "mmossad2324-cpu",
+      "github_repo": "https://github.com/mmossad2324-cpu/reports-patches-storage",
+      "hf_space": "mmossad2324/remediation-dashboard",
+      "role": "Remediation Engine & Streamlit Web Dashboard"
+    }
+  ],
+  "orchestrator": {
+    "auto_sync_interval_hours": 6,
+    "max_concurrent_sessions": 5,
+    "sandbox_timeout_seconds": 300
+  }
+}

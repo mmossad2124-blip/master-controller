@@ -1,0 +1,323 @@
+name: "🥷 Mossad Security Scanner Engine"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Target URL to scan (e.g. https://example.com)"
+        required: true
+        type: string
+      scan_type:
+        description: "Scan depth"
+        required: true
+        default: "full"
+        type: choice
+        options:
+          - quick
+          - full
+          - deep
+
+jobs:
+  recon:
+    name: "Phase 1 — Reconnaissance"
+    runs-on: ubuntu-latest
+    outputs:
+      target_host: ${{ steps.parse.outputs.host }}
+      target_ip: ${{ steps.parse.outputs.ip }}
+    steps:
+      - name: "Parse target"
+        id: parse
+        run: |
+          TARGET="${{ inputs.target_url }}"
+          HOST=$(echo $TARGET | sed 's|https\?://||' | cut -d/ -f1 | cut -d: -f1)
+          IP=$(dig +short $HOST | head -1)
+          echo "host=$HOST" >> $GITHUB_OUTPUT
+          echo "ip=${IP:-unknown}" >> $GITHUB_OUTPUT
+          echo "🎯 Target: $HOST ($IP)"
+
+      - name: "Install tools"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq nmap curl dnsutils whois
+          
+          # Install Go tools
+          export GO_VERSION="1.21.0"
+          wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+          export PATH=$PATH:/usr/local/go/bin
+          
+          # Install nuclei
+          go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+          ~/go/bin/nuclei -update-templates -silent
+          
+          # Install subfinder
+          go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+          
+          # Install httpx
+          go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+          
+          # Install ffuf
+          go install github.com/ffuf/ffuf/v2@latest
+          
+          echo "✅ All tools installed"
+
+      - name: "DNS Enumeration"
+        run: |
+          HOST="${{ steps.parse.outputs.host }}"
+          mkdir -p results
+          
+          echo "=== DNS Records ===" > results/dns.txt
+          dig A $HOST +short >> results/dns.txt
+          dig AAAA $HOST +short >> results/dns.txt
+          dig MX $HOST +short >> results/dns.txt
+          dig NS $HOST +short >> results/dns.txt
+          dig TXT $HOST +short >> results/dns.txt
+          
+          echo "=== WHOIS ===" >> results/dns.txt
+          whois $HOST 2>/dev/null | head -30 >> results/dns.txt
+          
+          cat results/dns.txt
+
+      - name: "Subdomain Discovery"
+        run: |
+          HOST="${{ steps.parse.outputs.host }}"
+          ~/go/bin/subfinder -d $HOST -silent -o results/subdomains.txt || true
+          echo "Found $(wc -l < results/subdomains.txt 2>/dev/null || echo 0) subdomains"
+          cat results/subdomains.txt 2>/dev/null || echo "No subdomains found"
+
+      - name: "Port Scan (nmap)"
+        run: |
+          HOST="${{ steps.parse.outputs.host }}"
+          
+          if [ "${{ inputs.scan_type }}" = "deep" ]; then
+            PORTS="-p-"
+          elif [ "${{ inputs.scan_type }}" = "full" ]; then
+            PORTS="-p 21,22,23,25,53,80,110,143,443,445,993,995,1433,3306,3389,5432,6379,8080,8443,8888,27017"
+          else
+            PORTS="-p 80,443,8080,8443"
+          fi
+          
+          nmap $PORTS -sV -sC --script=http-headers,http-title,ssl-cert \
+            --open -T4 -oX results/nmap.xml -oN results/nmap.txt $HOST || true
+          
+          echo "=== Nmap Results ===" && cat results/nmap.txt || true
+
+      - name: "HTTP Fingerprinting (httpx)"
+        run: |
+          TARGET="${{ inputs.target_url }}"
+          HOST="${{ steps.parse.outputs.host }}"
+          
+          echo "$TARGET" | ~/go/bin/httpx \
+            -title -status-code -content-length -response-time \
+            -tech-detect -server -content-type \
+            -json -o results/httpx.json -silent || true
+          
+          cat results/httpx.json 2>/dev/null || echo "No httpx results"
+
+      - name: "Nuclei Vulnerability Scan"
+        run: |
+          TARGET="${{ inputs.target_url }}"
+          
+          if [ "${{ inputs.scan_type }}" = "quick" ]; then
+            SEVERITY="-severity critical,high"
+          else
+            SEVERITY="-severity critical,high,medium"
+          fi
+          
+          ~/go/bin/nuclei -u "$TARGET" \
+            $SEVERITY \
+            -tags cve,misconfig,exposure,takeover,tech \
+            -json-export results/nuclei.json \
+            -markdown-export results/nuclei_report.md \
+            -silent -timeout 10 || true
+          
+          echo "=== Nuclei Findings ==="
+          cat results/nuclei.json 2>/dev/null | python3 -c "
+import sys, json
+count = 0
+for line in sys.stdin:
+    try:
+        finding = json.loads(line.strip())
+        sev = finding.get('info', {}).get('severity', 'unknown')
+        name = finding.get('info', {}).get('name', 'unknown')
+        matched = finding.get('matched-at', '')
+        print(f'[{sev.upper()}] {name} — {matched}')
+        count += 1
+    except:
+        pass
+print(f'Total: {count} findings')
+" || echo "No nuclei findings"
+
+      - name: "Directory Discovery (ffuf)"
+        run: |
+          TARGET="${{ inputs.target_url }}"
+          
+          # Built-in wordlist
+          cat << 'WORDLIST' > /tmp/wordlist.txt
+          admin
+          login
+          api
+          api/v1
+          api/v2
+          .env
+          .git/HEAD
+          wp-admin
+          phpmyadmin
+          config
+          backup
+          robots.txt
+          sitemap.xml
+          swagger
+          graphql
+          debug
+          console
+          .well-known/security.txt
+          uploads
+          static
+          assets
+          dashboard
+          panel
+          manager
+          WORDLIST
+          
+          ~/go/bin/ffuf -u "$TARGET/FUZZ" \
+            -w /tmp/wordlist.txt \
+            -mc 200,301,302,403 \
+            -o results/ffuf.json -of json \
+            -t 20 -timeout 5 -silent || true
+          
+          echo "=== Directory Results ==="
+          cat results/ffuf.json 2>/dev/null | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    for r in data.get('results', []):
+        print(f'HTTP {r[\"status\"]} → /{r[\"input\"][\"FUZZ\"]} ({r[\"length\"]} bytes)')
+except:
+    print('No directory findings or parse error')
+" || echo "No results"
+
+      - name: "Build JSON Report"
+        run: |
+          python3 << 'PYEOF'
+          import json, os, re
+          
+          report = {
+              "target": "${{ inputs.target_url }}",
+              "scan_type": "${{ inputs.scan_type }}",
+              "host": "${{ steps.parse.outputs.host }}",
+              "ip": "${{ steps.parse.outputs.ip }}",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "dns": {},
+              "subdomains": [],
+              "ports": [],
+              "nuclei_findings": [],
+              "directories": [],
+              "httpx": {}
+          }
+          
+          # Parse DNS
+          if os.path.exists("results/dns.txt"):
+              with open("results/dns.txt") as f:
+                  report["dns"]["raw"] = f.read()
+          
+          # Parse subdomains
+          if os.path.exists("results/subdomains.txt"):
+              with open("results/subdomains.txt") as f:
+                  report["subdomains"] = [l.strip() for l in f if l.strip()]
+          
+          # Parse nmap
+          if os.path.exists("results/nmap.txt"):
+              with open("results/nmap.txt") as f:
+                  content = f.read()
+                  report["ports_raw"] = content
+                  # Extract open ports
+                  ports = re.findall(r'(\d+/\w+)\s+open\s+(\S+)', content)
+                  report["ports"] = [{"port": p[0], "service": p[1]} for p in ports]
+          
+          # Parse nuclei
+          if os.path.exists("results/nuclei.json"):
+              with open("results/nuclei.json") as f:
+                  for line in f:
+                      try:
+                          finding = json.loads(line.strip())
+                          report["nuclei_findings"].append({
+                              "name": finding.get("info", {}).get("name"),
+                              "severity": finding.get("info", {}).get("severity"),
+                              "description": finding.get("info", {}).get("description"),
+                              "matched_at": finding.get("matched-at"),
+                              "template_id": finding.get("template-id"),
+                              "tags": finding.get("info", {}).get("tags", [])
+                          })
+                      except:
+                          pass
+          
+          # Parse ffuf
+          if os.path.exists("results/ffuf.json"):
+              try:
+                  with open("results/ffuf.json") as f:
+                      ffuf_data = json.load(f)
+                      for r in ffuf_data.get("results", []):
+                          report["directories"].append({
+                              "path": f"/{r['input']['FUZZ']}",
+                              "status": r["status"],
+                              "size": r["length"]
+                          })
+              except:
+                  pass
+          
+          # Parse httpx
+          if os.path.exists("results/httpx.json"):
+              try:
+                  with open("results/httpx.json") as f:
+                      for line in f:
+                          try:
+                              report["httpx"] = json.loads(line.strip())
+                              break
+                          except:
+                              pass
+              except:
+                  pass
+          
+          # Summary counts
+          report["summary"] = {
+              "total_ports": len(report["ports"]),
+              "total_subdomains": len(report["subdomains"]),
+              "total_nuclei_findings": len(report["nuclei_findings"]),
+              "critical_findings": len([f for f in report["nuclei_findings"] if f.get("severity") == "critical"]),
+              "high_findings": len([f for f in report["nuclei_findings"] if f.get("severity") == "high"]),
+              "total_directories": len(report["directories"])
+          }
+          
+          with open("results/final_report.json", "w") as f:
+              json.dump(report, f, indent=2)
+          
+          print("=== SCAN SUMMARY ===")
+          print(json.dumps(report["summary"], indent=2))
+          PYEOF
+
+      - name: "Upload Results"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "security-scan-results"
+          path: results/
+          retention-days: 7
+
+      - name: "Print Summary"
+        run: |
+          echo "================================"
+          echo "🥷 MOSSAD ETHICAL HACKER — SCAN COMPLETE"
+          echo "================================"
+          python3 -c "
+import json
+with open('results/final_report.json') as f:
+    r = json.load(f)
+s = r['summary']
+print(f'Target: {r[\"target\"]}')
+print(f'Open Ports: {s[\"total_ports\"]}')
+print(f'Subdomains: {s[\"total_subdomains\"]}')
+print(f'Nuclei Findings: {s[\"total_nuclei_findings\"]}')
+print(f'  Critical: {s[\"critical_findings\"]}')
+print(f'  High: {s[\"high_findings\"]}')
+print(f'Directories Found: {s[\"total_directories\"]}')
+"

@@ -1,0 +1,5 @@
+nmap
+nikto
+dirb
+dnsutils
+whois
